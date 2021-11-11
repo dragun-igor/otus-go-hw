@@ -38,25 +38,16 @@ func Unpack(in string) (string, error) {
 	var str string
 	runes := []rune(in)
 	for i, r := range runes {
-		switch i {
-		case 0:
-			if !unicode.IsLetter(r) && r != 10 { // r == 10 => "\n"
-				err = ErrInvalidString
-			}
-		case len(runes) - 1:
-			if unicode.IsDigit(r) {
-				str, err = digit(r, prevr)
-			}
-			if unicode.IsLetter(r) || r == 10 { // r == 10 => "\n"
-				str, err = notdigit(prevr)
+		if !unicode.IsLetter(r) && r != 10 && i == 0 { // r == 10 => "\n"
+			err = ErrInvalidString
+		}
+		if unicode.IsDigit(r) && i != 0 {
+			str, err = digit(r, prevr)
+		}
+		if (unicode.IsLetter(r) || r == 10) && i != 0 { // r == 10 => "\n"
+			str, err = notdigit(prevr)
+			if i == len(runes)-1 {
 				str += string(r)
-			}
-		default:
-			if unicode.IsDigit(r) {
-				str, err = digit(r, prevr)
-			}
-			if unicode.IsLetter(r) || r == 10 { // r == 10 => "\n"
-				str, err = notdigit(prevr)
 			}
 		}
 		if err != nil {
