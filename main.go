@@ -1,7 +1,8 @@
-package hw02unpackstring
+package main
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 	"unicode"
@@ -10,7 +11,7 @@ import (
 var ErrInvalidString = errors.New("invalid string")
 
 func digit(r rune, prevr rune) (string, error) {
-	if unicode.IsLetter(prevr) || prevr == 10 { //r == 10 => "\n"
+	if unicode.IsLetter(prevr) || prevr == 10 {
 		num, _ := strconv.Atoi(string(r))
 		result := strings.Repeat(string(prevr), num)
 		return result, nil
@@ -25,38 +26,38 @@ func notdigit(r rune, prevr rune) (string, error) {
 	if unicode.IsDigit(prevr) {
 		return "", nil
 	}
-	if prevr == 10 { //r == 10 => "\n"
+	if prevr == 10 {
 		return "\n", nil
 	}
 	return "", ErrInvalidString
 }
 
-func Unpack(in string) (string, error) {
+func test(instr string) (string, error) {
 	var result strings.Builder
 	var prevr rune
 	var err error
 	var str string
-	runes := []rune(in)
+	runes := []rune(instr)
 	for i, r := range runes {
 		switch i {
 		case 0:
-			if !unicode.IsLetter(r) && r != 10 { //r == 10 => "\n"
+			if !unicode.IsLetter(r) && r != 10 {
 				err = ErrInvalidString
-			}
-		case len(runes) - 1:
-			if unicode.IsDigit(r) {
-				str, err = digit(r, prevr)
-			}
-			if unicode.IsLetter(r) || r == 10 { //r == 10 => "\n"
-				str, err = notdigit(r, prevr)
-				str += string(r)
 			}
 		default:
 			if unicode.IsDigit(r) {
 				str, err = digit(r, prevr)
 			}
-			if unicode.IsLetter(r) || r == 10 { //r == 10 => "\n"
+			if unicode.IsLetter(r) || r == 10 {
 				str, err = notdigit(r, prevr)
+			}
+		case len(runes) - 1:
+			if unicode.IsDigit(r) {
+				str, err = digit(r, prevr)
+			}
+			if unicode.IsLetter(r) || r == 10 {
+				str, err = notdigit(r, prevr)
+				str += string(r)
 			}
 		}
 		if err != nil {
@@ -66,4 +67,10 @@ func Unpack(in string) (string, error) {
 		prevr = r
 	}
 	return result.String(), nil
+}
+
+func main() {
+
+	fmt.Println(test(45))
+
 }
