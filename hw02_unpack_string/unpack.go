@@ -46,8 +46,14 @@ func (token *token) Digit() (string, error) {
 	if token.protected {
 		return string(token.r), nil
 	}
-	if !(token.prev.backslash && !token.prev.protected) && num > 0 {
-		return strings.Repeat(string(token.prev.r), num-1), nil
+	if !(token.prev.backslash && !token.prev.protected) {
+		if num > 0 {
+			return strings.Repeat(string(token.prev.r), num-1), nil
+		}
+		if num == 0 {
+			token.prev.out = ""
+			return "", nil
+		}
 	}
 	return "", ErrInvalidString
 }
@@ -92,7 +98,9 @@ func Unpack(in string) (string, error) {
 		if tokens[i].err != nil {
 			return "", tokens[i].err
 		}
-		result.WriteString(tokens[i].out)
+	}
+	for _, t := range tokens {
+		result.WriteString(t.out)
 	}
 	return result.String(), nil
 }
