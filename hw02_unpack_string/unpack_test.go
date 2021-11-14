@@ -51,13 +51,57 @@ func TestUnpackWithAsterisk(t *testing.T) {
 	}
 }
 
-func TestUnpackInvalidString(t *testing.T) {
-	invalidStrings := []string{"3abc", "45", "aaa10b", "д\n\n12", "a-b", ".n", `\nty3`, `i3\`, `r3\\\i`}
+func TestErrFirstChar(t *testing.T) {
+	invalidStrings := []string{"3abc", "45", "0p"}
 	for _, tc := range invalidStrings {
 		tc := tc
 		t.Run(tc, func(t *testing.T) {
 			_, err := Unpack(tc)
-			require.Truef(t, errors.Is(err, ErrInvalidString), "actual error %q", err)
+			require.Truef(t, errors.Is(err, ErrFirstChar), "actual error %q", err)
+		})
+	}
+}
+
+func TestErrInvalidChar(t *testing.T) {
+	invalidStrings := []string{"a-bc", "kf.y", "al/r"}
+	for _, tc := range invalidStrings {
+		tc := tc
+		t.Run(tc, func(t *testing.T) {
+			_, err := Unpack(tc)
+			require.Truef(t, errors.Is(err, ErrInvalidChar), "actual error %q", err)
+		})
+	}
+}
+
+func TestErrTwoDigit(t *testing.T) {
+	invalidStrings := []string{"gj78", "i09", "y67"}
+	for _, tc := range invalidStrings {
+		tc := tc
+		t.Run(tc, func(t *testing.T) {
+			_, err := Unpack(tc)
+			require.Truef(t, errors.Is(err, ErrTwoDigit), "actual error %q", err)
+		})
+	}
+}
+
+func TestErrProtLetter(t *testing.T) {
+	invalidStrings := []string{`lk\n`, `kj\q`, `uh\r`}
+	for _, tc := range invalidStrings {
+		tc := tc
+		t.Run(tc, func(t *testing.T) {
+			_, err := Unpack(tc)
+			require.Truef(t, errors.Is(err, ErrProtLetter), "actual error %q", err)
+		})
+	}
+}
+
+func TestErrLastBackslash(t *testing.T) {
+	invalidStrings := []string{`lk\`, `kj\`, `uh\`}
+	for _, tc := range invalidStrings {
+		tc := tc
+		t.Run(tc, func(t *testing.T) {
+			_, err := Unpack(tc)
+			require.Truef(t, errors.Is(err, ErrLastBackslash), "actual error %q", err)
 		})
 	}
 }

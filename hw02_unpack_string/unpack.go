@@ -72,6 +72,9 @@ func (token *token) NotDigit() (string, error) {
 }
 
 func Unpack(in string) (string, error) {
+	if in == "" {
+		return "", nil
+	}
 	var result strings.Builder
 	runes := []rune(in)
 	tokens := make([]token, len(runes))
