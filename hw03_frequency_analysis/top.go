@@ -11,11 +11,10 @@ type freqstruct struct {
 }
 
 func Top10(in string) []string {
-	intolower := strings.ToLower(in)
 	// Инициализируем карту
 	freqmap := make(map[string]int)
 	// Разделяем строку по пробелам и подсчитываем количество слов => map[слово] = количество повторений
-	for _, value := range strings.Fields(intolower) {
+	for _, value := range strings.Fields(in) {
 		freqmap[value]++
 	}
 	// Создаём слайс, в котором будут храниться структуры freqstruct. Это необходимо для того, чтобы произвести сортировку
