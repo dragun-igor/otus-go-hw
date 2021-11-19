@@ -1,4 +1,4 @@
-module hw04lrucache
+module github.com/dragun-igor/otus-go-hw/hw04_lru_cache
 
 go 1.16
 
