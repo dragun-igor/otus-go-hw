@@ -5,42 +5,42 @@ import (
 	"strings"
 )
 
-type freqstruct struct {
+type freqStruct struct {
 	word   string
 	amount int
 }
 
 func Top10(in string) []string {
 	// Инициализируем карту
-	freqmap := make(map[string]int)
+	freqMap := make(map[string]int)
 	// Разделяем строку по пробелам и подсчитываем количество слов => map[слово] = количество повторений
 	for _, value := range strings.Fields(in) {
-		freqmap[value]++
+		freqMap[value]++
 	}
 	// Создаём слайс, в котором будут храниться структуры freqstruct. Это необходимо для того, чтобы произвести сортировку
-	freqslice := make([]freqstruct, 0, len(freqmap))
-	for key, value := range freqmap {
-		freqslice = append(freqslice, freqstruct{key, value})
+	freqSlice := make([]freqStruct, 0, len(freqMap))
+	for key, value := range freqMap {
+		freqSlice = append(freqSlice, freqStruct{key, value})
 	}
 	// Сортируем структуры по количеству повторений
-	sort.Slice(freqslice, func(i, j int) bool { return freqslice[i].amount > freqslice[j].amount })
+	sort.Slice(freqSlice, func(i, j int) bool { return freqSlice[i].amount > freqSlice[j].amount })
 	// Создаём карту, в которую размещаем слайсы структур, сгруппированных по количеству повторений
-	repnum := make(map[int][]freqstruct)
-	for _, value := range freqslice {
-		repnum[value.amount] = append(repnum[value.amount], value)
+	repNum := make(map[int][]freqStruct)
+	for _, value := range freqSlice {
+		repNum[value.amount] = append(repNum[value.amount], value)
 	}
 	// Создаём слайс в котором будут хранится отсортированные значения повторений и лексиграфически сортируем слайсы
-	keyslice := make([]int, 0, len(repnum))
-	for amount := range repnum {
-		keyslice = append(keyslice, amount)
-		sort.Slice(repnum[amount], func(i, j int) bool { return repnum[amount][i].word < repnum[amount][j].word })
+	keySlice := make([]int, 0, len(repNum))
+	for amount := range repNum {
+		keySlice = append(keySlice, amount)
+		sort.Slice(repNum[amount], func(i, j int) bool { return repNum[amount][i].word < repNum[amount][j].word })
 	}
-	sort.Slice(keyslice, func(i, j int) bool { return keyslice[i] > keyslice[j] })
+	sort.Slice(keySlice, func(i, j int) bool { return keySlice[i] > keySlice[j] })
 	// Создаём слайс, в котором будет храниться результат
 	result := make([]string, 0, 10)
 	num := 0
-	for _, key := range keyslice {
-		for _, value := range repnum[key] {
+	for _, key := range keySlice {
+		for _, value := range repNum[key] {
 			result = append(result, value.word)
 			num++
 			if num >= 10 {
