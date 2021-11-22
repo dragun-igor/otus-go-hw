@@ -35,8 +35,7 @@ type token struct {
 	err       error  // ошибка
 }
 
-// Функции для обработки цифровой руны
-func (token *token) Digit() (string, error) {
+func (token *token) Digit() (string, error) { // Функции для обработки цифровой руны
 	if token.first {
 		return "", ErrFirstChar
 	}
@@ -63,8 +62,7 @@ func (token *token) Digit() (string, error) {
 	return "", ErrInvalidString
 }
 
-// Метод обработки нецифровой руны (буквы, бэкслэш, перенос строки)
-func (token *token) NotDigit() (string, error) {
+func (token *token) NotDigit() (string, error) { // Метод обработки нецифровой руны (буквы, бэкслэш, перенос строки)
 	if token.letter && token.protected {
 		return "", ErrProtLetter
 	}
