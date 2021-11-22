@@ -17,24 +17,25 @@ var (
 )
 
 const (
-	BACKSLASH = 92
-	LINEFEED  = 10
+	BACKSLASH = 92 // руна бэкслэша
+	LINEFEED  = 10 // руна переноса строки
 )
 
 type token struct {
-	r         rune
-	prev      *token
-	protected bool
-	digit     bool
-	letter    bool
-	backslash bool
-	linefeed  bool
-	first     bool
-	last      bool
-	out       string
-	err       error
+	r         rune   // текущая руна
+	prev      *token // предыдущий элемент
+	protected bool   // экранирован или нет
+	digit     bool   // цифра
+	letter    bool   // буква
+	backslash bool   // обратный слэш
+	linefeed  bool   // перенос строки
+	first     bool   // первый элемент
+	last      bool   // последний элемент
+	out       string // конечная строка
+	err       error  // ошибка
 }
 
+// Функции для обработки цифровой руны
 func (token *token) Digit() (string, error) {
 	if token.first {
 		return "", ErrFirstChar
@@ -42,7 +43,11 @@ func (token *token) Digit() (string, error) {
 	if token.prev.digit && !token.prev.protected {
 		return "", ErrTwoDigit
 	}
-	num, _ := strconv.Atoi(string(token.r))
+	num, errAtoi := strconv.Atoi(string(token.r))
+	if errAtoi != nil {
+		return "", errAtoi
+	}
+
 	if token.protected {
 		return string(token.r), nil
 	}
@@ -58,6 +63,7 @@ func (token *token) Digit() (string, error) {
 	return "", ErrInvalidString
 }
 
+// Метод обработки нецифровой руны (буквы, бэкслэш, перенос строки)
 func (token *token) NotDigit() (string, error) {
 	if token.letter && token.protected {
 		return "", ErrProtLetter
