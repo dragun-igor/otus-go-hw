@@ -68,7 +68,7 @@ func TestRun(t *testing.T) {
 		require.LessOrEqual(t, int64(elapsedTime), int64(sumTime/2), "tasks were run sequentially?")
 	})
 
-	t.Run("task with m<=0", func(t *testing.T) { // При m <= 0 функция должна игнорировать ошибки
+	t.Run("task with m <= 0", func(t *testing.T) { // При m <= 0 функция должна игнорировать ошибки
 		tasksCount := 50
 		tasks := make([]Task, 0, tasksCount)
 
@@ -97,4 +97,34 @@ func TestRun(t *testing.T) {
 		require.Equal(t, runTasksCount, int32(tasksCount), "not all tasks were completed")
 		require.LessOrEqual(t, int64(elapsedTime), int64(sumTime/2), "tasks were run sequentially?")
 	})
+
+	//	t.Run("task with eventually", func(t *testing.T) {
+	//		tasksCount := 50
+	//		tasks := make([]Task, 0, tasksCount)
+	//	var runTasksCount int32
+	//		var curTasksCount int32
+	//
+	//		for i := 0; i < tasksCount; i++ {
+	//			tasks = append(tasks, func() error {
+	//				atomic.AddInt32(&curTasksCount, 1)
+	//				time.Sleep(time.Millisecond * 50)
+	//				atomic.AddInt32(&curTasksCount, -1)
+	//				return nil
+	//			})
+	//		}
+	//		workersCount := 10
+	//		maxErrosCount := 0
+	//
+	//		require.Eventually(t, func() bool {
+	//			cTC := atomic.LoadInt32(&curTasksCount)
+	//			return cTC > 0
+	//		}, time.Second*10, time.Millisecond*10, "tasks were run sequentially?")
+	//
+	//		_ = Run(tasks, workersCount, maxErrosCount)
+	//		require.Eventually(t, func() bool {
+	//			cTC := atomic.LoadInt32(&curTasksCount)
+	//			return cTC > 0
+	//		}, time.Second*10, time.Millisecond*10, "tasks were run sequentially?")
+	//
+	//	})
 }
