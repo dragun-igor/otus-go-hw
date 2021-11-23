@@ -46,7 +46,7 @@ func Run(tasks []Task, n, m int) error {
 	}
 	i := 0
 Producer:
-	for { // Мне очень не нравится этот кусок, но по-другому не придумал
+	for { // Мне очень не нравится этот кусок
 		select {
 		case ch <- tasks[i]:
 			if i < len(tasks)-1 {
@@ -55,14 +55,14 @@ Producer:
 				break Producer
 			}
 		default:
-			if int(errCount) >= workerAmount && m > 0 {
+			if int(atomic.LoadInt32(&errCount)) >= workerAmount && m > 0 {
 				errResult = ErrErrorsLimitExceeded
 				break Producer
 			}
 		}
 	}
 
-	for i := 0; i < workerAmount-int(errCount); i++ { // Раздём команды на завершение работы горутин
+	for i := 0; i < workerAmount-int(atomic.LoadInt32(&errCount)); i++ { // Раздём команды на завершение работы горутин
 		done <- true
 	}
 	wg.Wait()
