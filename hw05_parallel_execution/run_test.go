@@ -12,8 +12,6 @@ import (
 	"go.uber.org/goleak"
 )
 
-var curTasksCount int32
-
 func TestRun(t *testing.T) {
 	defer goleak.VerifyNone(t)
 
