@@ -99,37 +99,4 @@ func TestRun(t *testing.T) {
 		require.Equal(t, runTasksCount, int32(tasksCount), "not all tasks were completed")
 		require.LessOrEqual(t, int64(elapsedTime), int64(sumTime/2), "tasks were run sequentially?")
 	})
-
-	check := false // Очень кривой юнит-тест, но я не смог придумать как ещё проверить количество горутин, подскажите, пожалуйста
-	go func() {
-		t.Run("task with eventually", func(t *testing.T) {
-			tasksCount := 50
-			tasks := make([]Task, 0, tasksCount)
-
-			for i := 0; i < tasksCount; i++ {
-				tasks = append(tasks, func() error {
-					atomic.AddInt32(&curTasksCount, 1)
-					for {
-						if check {
-							break
-						}
-					}
-					return nil
-				})
-			}
-			workersCount := 10
-			maxErrosCount := 0
-
-			_ = Run(tasks, workersCount, maxErrosCount)
-		})
-	}()
-	require.Eventually(t, func() bool {
-		for {
-			cTC := atomic.LoadInt32(&curTasksCount)
-			if cTC > 1 {
-				check = true
-				return true
-			}
-		}
-	}, time.Second*10, time.Microsecond, "tasks were run sequentially?")
 }
