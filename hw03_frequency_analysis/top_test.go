@@ -80,22 +80,3 @@ func TestTop10(t *testing.T) {
 		}
 	})
 }
-
-var text2 = "go slice golang go go test mutex mutex "
-
-func TestTop10Less(t *testing.T) {
-	t.Run("no words in empty string", func(t *testing.T) {
-		require.Len(t, Top10(""), 0)
-	})
-
-	t.Run("positive test", func(t *testing.T) {
-		expected := []string{
-			"go",
-			"mutex",
-			"golang",
-			"slice",
-			"test",
-		}
-		require.Equal(t, expected, Top10(text2))
-	})
-}
