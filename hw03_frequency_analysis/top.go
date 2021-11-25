@@ -7,9 +7,7 @@ import (
 
 func Top10(in string) []string {
 	result := make([]string, 0, 10)
-	// Инициализируем карту
 	freqMap := make(map[string]int)
-	// Разделяем строку по пробелам и подсчитываем количество слов => map[слово] = количество повторений
 	for _, value := range strings.Fields(in) {
 		freqMap[value]++
 	}
