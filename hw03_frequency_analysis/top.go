@@ -30,11 +30,8 @@ func Top10(in string) []string {
 	if len(uniqueWords) >= 10 {
 		result = uniqueWords[0:10]
 	}
-	if len(uniqueWords) < 10 {
+	if len(uniqueWords) < 10 && len(uniqueWords) > 0 {
 		result = uniqueWords
-	}
-	if len(uniqueWords) == 0 {
-		result = nil
 	}
 	return result
 }
