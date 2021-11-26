@@ -10,7 +10,7 @@ var ErrErrorsLimitExceeded = errors.New("errors limit exceeded")
 
 type Task func() error
 
-func Consumer(wg *sync.WaitGroup, ch <-chan Task, done <-chan bool, m int, errCount *int32) { // Функция-приёмник
+func Consumer(wg *sync.WaitGroup, ch <-chan Task, done <-chan struct{}, m int, errCount *int32) { // Функция-приёмник
 	defer wg.Done()
 	for {
 		select {
@@ -28,11 +28,11 @@ func Consumer(wg *sync.WaitGroup, ch <-chan Task, done <-chan bool, m int, errCo
 // Run starts tasks in n goroutines and stops its work when receiving m errors from tasks.
 func Run(tasks []Task, n, m int) error {
 	// Инициализация переменных
-	var wg sync.WaitGroup   // WG
-	ch := make(chan Task)   // Канал передачи данных
-	done := make(chan bool) // Сигнальный канал для завершения работы горутин
-	var errResult error     // Конечная ошибка
-	var errCount int32      // Счётчик ошибок, тип int64, так как используются атомарные операции
+	var wg sync.WaitGroup       // WG
+	ch := make(chan Task)       // Канал передачи данных
+	done := make(chan struct{}) // Сигнальный канал для завершения работы горутин
+	var errResult error         // Конечная ошибка
+	var errCount int32          // Счётчик ошибок, тип int64, так как используются атомарные операции
 
 	// Если количество горутин больше длины массива, то количество горутин должно быть ограничено
 	if n > len(tasks) {
