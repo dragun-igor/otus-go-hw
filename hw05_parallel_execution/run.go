@@ -27,33 +27,30 @@ func Consumer(wg *sync.WaitGroup, ch <-chan Task, done <-chan bool, m int, errCo
 
 // Run starts tasks in n goroutines and stops its work when receiving m errors from tasks.
 func Run(tasks []Task, n, m int) error {
-	var wg sync.WaitGroup
-	ch := make(chan Task)   // Канал передачи функций
-	done := make(chan bool) // Канал для передачи команды завершения горутины
-	var workerAmount int    // Количество воркеров
+	// Инициализация переменных
+	var wg sync.WaitGroup   // WG
+	ch := make(chan Task)   // Канал передачи данных
+	done := make(chan bool) // Сигнальный канал для завершения работы горутин
 	var errResult error     // Конечная ошибка
 	var errCount int32      // Счётчик ошибок
-	if n > len(tasks) {     // Определяем количество воркеров
-		workerAmount = len(tasks)
-	} else {
-		workerAmount = n
+
+	if n > len(tasks) {
+		n = len(tasks)
 	}
-	for i := 0; i < workerAmount; i++ { // Создём горутины
-		wg.Add(1)
+
+	wg.Add(n)
+	for i := 0; i < n; i++ { // Создём горутины
 		go Consumer(&wg, ch, done, m, &errCount)
 	}
+
 	i := 0
 Producer:
-	for { // Мне очень не нравится этот кусок
+	for i < len(tasks) {
 		select {
 		case ch <- tasks[i]:
-			if i < len(tasks)-1 {
-				i++
-			} else {
-				break Producer
-			}
+			i++
 		default:
-			if int(atomic.LoadInt32(&errCount)) >= workerAmount && m > 0 {
+			if int(atomic.LoadInt32(&errCount)) >= n && m > 0 {
 				errResult = ErrErrorsLimitExceeded
 				break Producer
 			}
