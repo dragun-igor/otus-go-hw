@@ -6,7 +6,6 @@ import (
 )
 
 func Top10(in string) []string {
-	result := make([]string, 0, 10)
 	freqMap := make(map[string]int)
 	for _, value := range strings.Fields(in) {
 		freqMap[value]++
@@ -27,11 +26,12 @@ func Top10(in string) []string {
 		}
 		return false
 	})
-	if len(uniqueWords) >= 10 {
-		result = uniqueWords[0:10]
+	switch {
+	case len(uniqueWords) == 0:
+		return nil
+	case len(uniqueWords) < 10:
+		return uniqueWords
+	default:
+		return uniqueWords[0:10]
 	}
-	if len(uniqueWords) < 10 && len(uniqueWords) > 0 {
-		result = uniqueWords
-	}
-	return result
 }
