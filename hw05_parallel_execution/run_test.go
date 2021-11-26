@@ -116,8 +116,8 @@ func TestRun(t *testing.T) {
 		err := Run(tasks, tasksCount, 0)
 		require.NoError(t, err)
 	})
-	require.Eventually(t, func() bool { // Если количество запущенных функций равно количеству горутин,
-		// то закрываем канал и считаем тест пройденным
+	require.Eventually(t, func() bool {
+		// Если количество запущенных функций равно количеству горутин, то закрываем канал и считаем тест пройденным
 		if atomic.LoadInt32(&curTasksCount) == int32(tasksCount) {
 			close(chDone)
 			return true
