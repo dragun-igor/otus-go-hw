@@ -16,22 +16,19 @@ func Top10(in string) []string {
 	}
 
 	sort.Slice(uniqueWords, func(i, j int) bool {
-		firstWord := uniqueWords[i]
-		secondWord := uniqueWords[j]
-		if freqMap[firstWord] > freqMap[secondWord] {
-			return true
-		}
-		if freqMap[firstWord] == freqMap[secondWord] && firstWord < secondWord {
+		cond1 := freqMap[uniqueWords[i]] > freqMap[uniqueWords[j]]
+		cond2 := freqMap[uniqueWords[i]] == freqMap[uniqueWords[j]] && uniqueWords[i] < uniqueWords[j]
+		if cond1 || cond2 {
 			return true
 		}
 		return false
 	})
 	switch {
-	case len(uniqueWords) == 0:
-		return nil
-	case len(uniqueWords) < 10:
+	case len(uniqueWords) >= 10:
+		return uniqueWords[0:10]
+	case len(uniqueWords) > 0:
 		return uniqueWords
 	default:
-		return uniqueWords[0:10]
+		return nil
 	}
 }
