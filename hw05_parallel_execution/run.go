@@ -10,16 +10,11 @@ var ErrErrorsLimitExceeded = errors.New("errors limit exceeded")
 
 type Task func() error
 
-func Consumer(wg *sync.WaitGroup, ch <-chan Task, m int, errCount *int32) { // Функция-потребитель
+func Consumer(wg *sync.WaitGroup, ch <-chan Task, errCount *int32) { // Функция-потребитель
 	defer wg.Done()
-	for {
-		task, ok := <-ch
-		if !ok { // Если канал закрыт, завершаем функцию
-			return
-		}
-		if err := task(); err != nil && m > 0 { // Если m <= 0 игнорируем ошибки
+	for task := range ch {
+		if err := task(); err != nil {
 			atomic.AddInt32(errCount, 1)
-			return
 		}
 	}
 }
@@ -39,13 +34,12 @@ func Run(tasks []Task, n, m int) error {
 
 	wg.Add(n)
 	for i := 0; i < n; i++ { // Создём горутины-потребители
-		go Consumer(&wg, ch, m, &errCount)
+		go Consumer(&wg, ch, &errCount)
 	}
 
-	// Производитель.
-	// Передаём в канал функции из слайса.
-	// Если количество ошибок больше количества горутин, прерываем цикл.
-	// Если количество ошибок больше предельного количества ошибок, прерываем цикл.
+	// Производитель
+	// Передаём в канал функции из слайса
+	// Если количество ошибок больше предельного количества ошибок, прерываем цикл
 	// Если предельное количество ошибок - 0 или меньше, ошибки игнорируются
 	i := 0
 Producer:
@@ -54,7 +48,7 @@ Producer:
 		case ch <- tasks[i]:
 			i++
 		default:
-			if (int(atomic.LoadInt32(&errCount)) >= n || int(atomic.LoadInt32(&errCount)) >= m) && m > 0 {
+			if int(atomic.LoadInt32(&errCount)) >= m && m > 0 {
 				errResult = ErrErrorsLimitExceeded
 				break Producer
 			}
