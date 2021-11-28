@@ -11,10 +11,10 @@ type Cache interface {
 }
 
 type lruCache struct {
+	mutex    *sync.Mutex
 	capacity int
 	queue    List
 	items    map[Key]*ListItem
-	mutex    sync.Mutex
 }
 
 type cacheItem struct {
@@ -24,10 +24,10 @@ type cacheItem struct {
 
 func NewCache(capacity int) Cache {
 	return &lruCache{
+		mutex:    &sync.Mutex{},
 		capacity: capacity,
 		queue:    NewList(),
 		items:    make(map[Key]*ListItem, capacity),
-		mutex:    sync.Mutex{},
 	}
 }
 
