@@ -21,17 +21,5 @@ cmp out.txt testdata/out_offset100_limit1000.txt
 ./go-cp -from testdata/input.txt -to out.txt -offset 6000 -limit 1000
 cmp out.txt testdata/out_offset6000_limit1000.txt
 
-./go-cp -from testdata/input_ru.txt -to out.txt -mode rune
-cmp out.txt testdata/out_offset0_limit0_moderune.txt
-
-./go-cp -from testdata/input_ru.txt -to out.txt -offset 3 -mode rune
-cmp out.txt testdata/out_offset3_limit0_moderune.txt
-
-./go-cp -from testdata/input_ru.txt -to out.txt -limit 10 -mode rune
-cmp out.txt testdata/out_offset0_limit10_moderune.txt
-
-./go-cp -from testdata/input_ru.txt -to out.txt -offset 3 -limit 10 -mode rune
-cmp out.txt testdata/out_offset3_limit10_moderune.txt
-
 rm -f go-cp out.txt
 echo "PASS"
