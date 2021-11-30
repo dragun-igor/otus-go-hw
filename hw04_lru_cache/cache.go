@@ -32,8 +32,12 @@ func NewCache(capacity int) Cache {
 }
 
 func (lru *lruCache) Set(key Key, value interface{}) bool {
-	lru.mutex.Lock()
-	defer lru.mutex.Unlock()
+	lru.mutex.Lock() // Mutex для потокобезопасности
+	defer lru.mutex.Unlock() // Так делать нехорошо, но конкретной задачи нету
+	// Создаём новый кэш айтем, добавляем в него ключи и значение
+	// Если ключ существовал, то переносим в начало очереди и обновляем значение
+	// Если ключа не было, то добавляем значения в конец очереди
+	// Если очередь была полная - удаляем последний элемент
 	cache := new(cacheItem)
 	cache.key = key
 	cache.value = value
@@ -54,6 +58,7 @@ func (lru *lruCache) Set(key Key, value interface{}) bool {
 func (lru *lruCache) Get(key Key) (interface{}, bool) {
 	lru.mutex.Lock()
 	defer lru.mutex.Unlock()
+	// Всё просто, если запрашиваем значение по ключу, если ключ существовал, то переносим в начало очереди
 	listItem, ok := lru.items[key]
 	if ok {
 		lru.queue.MoveToFront(listItem)
@@ -63,6 +68,7 @@ func (lru *lruCache) Get(key Key) (interface{}, bool) {
 }
 
 func (lru *lruCache) Clear() {
+	// Создаём пустой список и привязываем к очереди
 	lru.mutex.Lock()
 	defer lru.mutex.Unlock()
 	lru.items = make(map[Key]*ListItem, lru.capacity)
