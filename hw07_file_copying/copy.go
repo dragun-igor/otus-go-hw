@@ -68,11 +68,11 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 		}
 		err = writer.WriteByte(b)
 		if err != nil {
-				return err
-			}
-			bar.Add(1)
-			time.Sleep(time.Millisecond) // Для наглядности програсс бара
+			return err
 		}
+		bar.Add(1)
+		time.Sleep(time.Millisecond) // Для наглядности програсс бара
+	}
 	// Переносим данные из буффера
 	if err := writer.Flush(); err != nil {
 		return err
