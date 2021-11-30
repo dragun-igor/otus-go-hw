@@ -49,6 +49,8 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 		return err
 	}
 	defer toFile.Close()
+	// Устанавливаем смещение
+	fromFile.Seek(offset, 0)
 	// Создаём буферезированные reader и writer
 	reader := bufio.NewReader(fromFile)
 	writer := bufio.NewWriter(toFile)
@@ -56,7 +58,7 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	bar := pb.StartNew(int(limit))
 	// Побайтово копируем данные
 	// Можно сделать, чтобы переносилось большими частями, но тогда прогресс бар будет не видно
-	for i := 0; int64(i) < limit+offset; i++ {
+	for i := 0; int64(i) < limit; i++ {
 		b, err := reader.ReadByte()
 		if err != nil && !errors.Is(err, io.EOF) {
 			return err
@@ -64,15 +66,13 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 		if errors.Is(err, io.EOF) {
 			break
 		}
-		if i >= int(offset) {
-			err = writer.WriteByte(b)
-			if err != nil {
+		err = writer.WriteByte(b)
+		if err != nil {
 				return err
 			}
 			bar.Add(1)
 			time.Sleep(time.Millisecond) // Для наглядности програсс бара
 		}
-	}
 	// Переносим данные из буффера
 	if err := writer.Flush(); err != nil {
 		return err
