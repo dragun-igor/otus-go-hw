@@ -32,7 +32,7 @@ func NewCache(capacity int) Cache {
 }
 
 func (lru *lruCache) Set(key Key, value interface{}) bool {
-	lru.mutex.Lock() // Mutex для потокобезопасности
+	lru.mutex.Lock()         // Mutex для потокобезопасности
 	defer lru.mutex.Unlock() // Так делать нехорошо, но конкретной задачи нету
 	// Создаём новый кэш айтем, добавляем в него ключи и значение
 	// Если ключ существовал, то переносим в начало очереди и обновляем значение

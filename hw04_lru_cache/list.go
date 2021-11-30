@@ -12,12 +12,12 @@ type List interface {
 
 type ListItem struct {
 	Value interface{} // Значений
-	Next  *ListItem // Указатель на следующий элемент
-	Prev  *ListItem // Указатель на предыдущий элемент
+	Next  *ListItem   // Указатель на следующий элемент
+	Prev  *ListItem   // Указатель на предыдущий элемент
 }
 
 type list struct {
-	length    int // Длина списка
+	length    int       // Длина списка
 	firstItem *ListItem // Первый элемент
 	lastItem  *ListItem // Последний элемент
 }
