@@ -18,6 +18,10 @@ func TestCopy(t *testing.T) {
 		err := Copy("testdata/input.txt", "testdata/out.txt", 0, -100)
 		assert.Equal(t, ErrIncorrectLimit, err)
 	})
+	t.Run("unsupported file", func(t *testing.T) {
+		err := Copy("/dev/urandom", "testdata/out.txt", 0, 0)
+		assert.Equal(t, ErrUnsupportedFile, err)
+	})
 	t.Run("offset > length", func(t *testing.T) {
 		err := Copy("testdata/input.txt", "testdata/out.txt", 50_000, 0)
 		assert.Equal(t, ErrOffsetExceedsFileSize, err)
