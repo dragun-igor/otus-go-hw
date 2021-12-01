@@ -65,7 +65,7 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	bar := pb.StartNew(int(limit))
 	// Побайтово копируем данные
 	// Я использовал ReadByte() для большей наглядности прогресс бара (он так более плавный)
-	// Намерено не использовал метод CopyN, так как он не работает с буферизированным вводом-выводом
+	// Намерено не использовал метод CopyN
 	// Знаю, что можно использовать io.reader.Read() и []Byte и ещё кучу вариантов
 	for i := 0; int64(i) < limit; i++ {
 		b, err := reader.ReadByte()                // Читаем байт
@@ -87,5 +87,6 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 		return err
 	}
 	bar.Finish()
+	_, err = io.CopyN(writer, reader, 12)
 	return nil
 }
