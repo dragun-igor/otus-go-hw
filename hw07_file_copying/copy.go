@@ -87,6 +87,5 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 		return err
 	}
 	bar.Finish()
-	_, err = io.CopyN(writer, reader, 12)
 	return nil
 }
