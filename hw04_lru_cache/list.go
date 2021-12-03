@@ -27,17 +27,17 @@ func NewList() List {
 	return new(list)
 }
 
-func (l *list) Len() int {
+func (l list) Len() int {
 	// Возвращаем длину
 	return l.length
 }
 
-func (l *list) Front() *ListItem {
+func (l list) Front() *ListItem {
 	// Возвращаем указатель на первый элемент
 	return l.firstItem
 }
 
-func (l *list) Back() *ListItem {
+func (l list) Back() *ListItem {
 	// Возвращаем указатель на последний элемент
 	return l.lastItem
 }
