@@ -40,7 +40,7 @@ func (lru *lruCache) Set(key Key, value interface{}) bool {
 	defer lru.mutex.Unlock()
 
 	cache := &cacheItem{
-		key: key,
+		key:   key,
 		value: value,
 	}
 	listItem, ok := lru.items[key]
