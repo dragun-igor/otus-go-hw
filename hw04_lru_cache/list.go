@@ -44,8 +44,7 @@ func (l list) Back() *ListItem {
 
 func (l *list) PushFront(v interface{}) *ListItem {
 	// Добавление нового элемента в начало списка
-	newItem := new(ListItem)
-	newItem.Value = v
+	newItem := &ListItem{Value: v}
 	if l.length == 0 {
 		l.lastItem = newItem
 	} else {
@@ -59,8 +58,7 @@ func (l *list) PushFront(v interface{}) *ListItem {
 
 func (l *list) PushBack(v interface{}) *ListItem {
 	// Добавление нового элемента в конец списка
-	newItem := new(ListItem)
-	newItem.Value = v
+	newItem := &ListItem{Value: v}
 	if l.length == 0 {
 		l.firstItem = newItem
 	} else {
@@ -104,9 +102,7 @@ func (l *list) Remove(i *ListItem) {
 }
 
 func (l *list) MoveToFront(i *ListItem) {
-	// Если длина больше 1 и элемент не первый - меняем указатели следующего и предыдущего элемента
-	// Меняем указатели первого элемента
-	// Переносим элемент на первое место
+	// Перемещение элемента в начало очереди
 	if l.length > 1 && i.Prev != nil {
 		l.lastItem = i.Prev
 		l.firstItem.Prev = i

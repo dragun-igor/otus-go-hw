@@ -1,6 +1,8 @@
 package hw04lrucache
 
-import "sync"
+import (
+	"sync"
+)
 
 type Key string
 
@@ -32,18 +34,15 @@ func NewCache(capacity int) Cache {
 }
 
 func (lru *lruCache) Set(key Key, value interface{}) bool {
+	// Установка значения по ключу
+	lru.mutex.Lock()
 
-	lru.mutex.Lock() // Mutex для потокобезопасности
+	defer lru.mutex.Unlock()
 
-	defer lru.mutex.Unlock() // Так делать нехорошо, но конкретной задачи нету
-
-	// Создаём новый кэш айтем, добавляем в него ключи и значение
-	// Если ключ существовал, то переносим в начало очереди и обновляем значение
-	// Если ключа не было, то добавляем значения в конец очереди
-	// Если очередь была полная - удаляем последний элемент
-	cache := new(cacheItem)
-	cache.key = key
-	cache.value = value
+	cache := &cacheItem{
+		key: key,
+		value: value,
+	}
 	listItem, ok := lru.items[key]
 	if !ok {
 		if lru.queue.Len() >= lru.capacity {
@@ -59,9 +58,11 @@ func (lru *lruCache) Set(key Key, value interface{}) bool {
 }
 
 func (lru *lruCache) Get(key Key) (interface{}, bool) {
+	// Получаем значение по ключу
 	lru.mutex.Lock()
+
 	defer lru.mutex.Unlock()
-	// Всё просто, если запрашиваем значение по ключу, если ключ существовал, то переносим в начало очереди
+
 	listItem, ok := lru.items[key]
 	if ok {
 		lru.queue.MoveToFront(listItem)
