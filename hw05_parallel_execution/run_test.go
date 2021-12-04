@@ -98,17 +98,17 @@ func TestRun(t *testing.T) {
 		require.LessOrEqual(t, int64(elapsedTime), int64(sumTime/2), "tasks were run sequentially?")
 	})
 
-	chDone := make(chan struct{})           // Объявляем общий канал для закрытия горутин
-	tasksCount := 10                        // Задаём количество функций
-	var curTasksCount int32                 // Объявляем переменную текущего количества запущенных функций
-	go t.Run("task *", func(t *testing.T) { // Запускаем тест как горутину, для работы require.Eventually
-		tasks := make([]Task, 0, tasksCount) // Создаём слайс функций
+	doneCh := make(chan struct{})
+	tasksCount := 10
+	var curTasksCount int32
+	go t.Run("task *", func(t *testing.T) {
+		tasks := make([]Task, 0, tasksCount)
 
 		for i := 0; i < tasksCount; i++ {
-			tasks = append(tasks, func() error { // Заполняем слайс функциями
-				atomic.AddInt32(&curTasksCount, 1)  // Прибавляем единицу к текущим запущенным функциями
-				<-chDone                            // Останавливаем функцию
-				atomic.AddInt32(&curTasksCount, -1) // Вычитаем единицу из текущих запущенных функций
+			tasks = append(tasks, func() error {
+				atomic.AddInt32(&curTasksCount, 1)
+				<-doneCh
+				atomic.AddInt32(&curTasksCount, -1)
 				return nil
 			})
 		}
@@ -117,9 +117,8 @@ func TestRun(t *testing.T) {
 		require.NoError(t, err)
 	})
 	require.Eventually(t, func() bool {
-		// Если количество запущенных функций равно количеству горутин, то закрываем канал и считаем тест пройденным
 		if atomic.LoadInt32(&curTasksCount) == int32(tasksCount) {
-			close(chDone)
+			close(doneCh)
 			return true
 		}
 		return false
