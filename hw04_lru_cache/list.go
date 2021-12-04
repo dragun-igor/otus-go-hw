@@ -11,7 +11,7 @@ type List interface {
 }
 
 type ListItem struct {
-	Value interface{} // Значений
+	Value interface{} // Значение
 	Next  *ListItem   // Указатель на следующий элемент
 	Prev  *ListItem   // Указатель на предыдущий элемент
 }
@@ -43,11 +43,7 @@ func (l list) Back() *ListItem {
 }
 
 func (l *list) PushFront(v interface{}) *ListItem {
-	// Создаём новый элемент со значением переданным в функцию
-	// Передаём его как первый элемент
-	// Если список был пустой, то ещё и как последний элемент
-	// Если не пустой, то меняем указатели
-	// Увеличиваем длину списка на 1
+	// Добавление нового элемента в начало списка
 	newItem := new(ListItem)
 	newItem.Value = v
 	if l.length == 0 {
@@ -62,11 +58,7 @@ func (l *list) PushFront(v interface{}) *ListItem {
 }
 
 func (l *list) PushBack(v interface{}) *ListItem {
-	// Создаём новый элемент со значением переданным в функцию
-	// Передаём его как последний элемент
-	// Если список был пустой, то ещё и как первый элемент
-	// Если не пустой, то меняем указатели
-	// Увеличиваем длину списка на 1
+	// Добавление нового элемента в конец списка
 	newItem := new(ListItem)
 	newItem.Value = v
 	if l.length == 0 {

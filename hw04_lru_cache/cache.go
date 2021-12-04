@@ -11,7 +11,7 @@ type Cache interface {
 }
 
 type lruCache struct {
-	mutex    *sync.Mutex
+	mutex    sync.Mutex
 	capacity int
 	queue    List
 	items    map[Key]*ListItem
@@ -24,7 +24,7 @@ type cacheItem struct {
 
 func NewCache(capacity int) Cache {
 	return &lruCache{
-		mutex:    &sync.Mutex{},
+		mutex:    sync.Mutex{},
 		capacity: capacity,
 		queue:    NewList(),
 		items:    make(map[Key]*ListItem, capacity),
@@ -32,8 +32,11 @@ func NewCache(capacity int) Cache {
 }
 
 func (lru *lruCache) Set(key Key, value interface{}) bool {
-	lru.mutex.Lock()         // Mutex для потокобезопасности
+
+	lru.mutex.Lock() // Mutex для потокобезопасности
+
 	defer lru.mutex.Unlock() // Так делать нехорошо, но конкретной задачи нету
+
 	// Создаём новый кэш айтем, добавляем в него ключи и значение
 	// Если ключ существовал, то переносим в начало очереди и обновляем значение
 	// Если ключа не было, то добавляем значения в конец очереди
@@ -42,15 +45,15 @@ func (lru *lruCache) Set(key Key, value interface{}) bool {
 	cache.key = key
 	cache.value = value
 	listItem, ok := lru.items[key]
-	if ok {
-		lru.queue.MoveToFront(listItem)
-		lru.queue.Front().Value = cache
-	} else {
+	if !ok {
 		if lru.queue.Len() >= lru.capacity {
 			delete(lru.items, lru.queue.Back().Value.(*cacheItem).key)
 			lru.queue.Remove(lru.queue.Back())
 		}
 		lru.items[key] = lru.queue.PushFront(cache)
+	} else {
+		lru.queue.MoveToFront(listItem)
+		lru.queue.Front().Value = cache
 	}
 	return ok
 }
@@ -70,7 +73,9 @@ func (lru *lruCache) Get(key Key) (interface{}, bool) {
 func (lru *lruCache) Clear() {
 	// Создаём пустой список и привязываем к очереди
 	lru.mutex.Lock()
+
 	defer lru.mutex.Unlock()
+
 	lru.items = make(map[Key]*ListItem, lru.capacity)
 	lru.queue = NewList()
 }
