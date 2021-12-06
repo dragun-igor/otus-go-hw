@@ -9,33 +9,11 @@ type (
 type Stage func(in In) (out Out)
 
 func ExecutePipeline(in In, done In, stages ...Stage) Out {
-	stageAmount := len(stages)
-	results := make([]Bi, 0, stageAmount+1)
-	for i := 0; i < len(stages)+1; i++ {
-		results = append(results, make(Bi))
-	}
-
-	// Переброска значений в первую ячейку слайса
-	go func() {
-		defer close(results[0])
-		for {
-			select {
-			case <-done:
-				return
-			case val, ok := <-in:
-				if !ok {
-					return
-				}
-				results[0] <- val
-			}
-		}
-	}()
-
-	// Объявление стейджей и переброска значений результата в следующую ячейку
-	for i, stage := range stages {
-		out := stage(results[i])
-		go func(i int) {
-			defer close(results[i+1])
+	out := in
+	for _, stage := range stages {
+		temp := make(Bi)
+		go func(temp Bi, out Out) {
+			defer close(temp)
 			for {
 				select {
 				case <-done:
@@ -44,12 +22,11 @@ func ExecutePipeline(in In, done In, stages ...Stage) Out {
 					if !ok {
 						return
 					}
-					results[i+1] <- val
+					temp <- val
 				}
 			}
-		}(i)
+		}(temp, out)
+		out = stage(temp)
 	}
-
-	// Возвращаем канал из последней ячейки слайса
-	return results[stageAmount]
+	return out
 }
