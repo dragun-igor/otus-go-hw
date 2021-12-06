@@ -15,11 +15,7 @@ func ExecutePipeline(in In, done In, stages ...Stage) Out {
 		results = append(results, make(Bi))
 	}
 
-	go func() {
-		<-done
-	}()
-
-	// Переброска значений в первую ячейку слайса, после окончания закрываем канал
+	// Переброска значений в первую ячейку слайса
 	go func() {
 		defer close(results[0])
 		for {
@@ -35,6 +31,7 @@ func ExecutePipeline(in In, done In, stages ...Stage) Out {
 		}
 	}()
 
+	// Объявление стейджей и переброска значений результата в следующую ячейку
 	for i, stage := range stages {
 		out := stage(results[i])
 		go func(i int) {

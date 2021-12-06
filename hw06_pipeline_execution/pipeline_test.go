@@ -91,7 +91,7 @@ func TestPipeline(t *testing.T) {
 	})
 
 	// Тест при сразу закрытом канале in
-	t.Run("extra test", func(t *testing.T) {
+	t.Run("test with closed in", func(t *testing.T) {
 		in := make(Bi)
 		close(in)
 		result := make([]string, 0, 10)
