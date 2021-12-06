@@ -8,6 +8,29 @@ type (
 
 type Stage func(in In) (out Out)
 
+func outChan(in In, done In) Bi {
+	out := make(Bi)
+	go func() {
+		defer close(out)
+		for {
+			select {
+			case <-done:
+				return
+			case val, ok := <-in:
+				if !ok {
+					return
+				}
+				select {
+				case <-done:
+					return
+				case out <- val:
+				}
+			}
+		}
+	}()
+	return out
+}
+
 func ExecutePipeline(in In, done In, stages ...Stage) Out {
 	out := in
 	for _, stage := range stages {
@@ -22,11 +45,19 @@ func ExecutePipeline(in In, done In, stages ...Stage) Out {
 					if !ok {
 						return
 					}
-					temp <- val
+					select {
+					case <-done:
+						return
+					case temp <- val:
+					}
 				}
 			}
 		}(temp, out)
 		out = stage(temp)
 	}
-	return out
+
+	// Добавляем выходной канал на чтение и запись, чтобы по сигналу done его можно было закрыть и прервать пайплайн
+	out2 := outChan(out, done)
+
+	return out2
 }
