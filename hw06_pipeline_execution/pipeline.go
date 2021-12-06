@@ -26,11 +26,11 @@ func ExecutePipeline(in In, done In, stages ...Stage) Out {
 			select {
 			case <-done:
 				return
-				case val, ok := <-in:
-					if !ok {
-						return
-					}
-					results[0] <- val
+			case val, ok := <-in:
+				if !ok {
+					return
+				}
+				results[0] <- val
 			}
 		}
 	}()
