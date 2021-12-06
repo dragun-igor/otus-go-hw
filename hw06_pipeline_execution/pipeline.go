@@ -36,28 +36,7 @@ func ExecutePipeline(in In, done In, stages ...Stage) Out {
 	// Выполнение пайплайна
 	out := in
 	for _, stage := range stages {
-		temp := make(Bi)
-		go func(temp Bi, out Out) {
-			defer close(temp)
-			for {
-				select {
-				case <-done:
-					return
-				case val, ok := <-out:
-					if !ok {
-						return
-					}
-					select {
-					case <-done:
-						return
-					case temp <- val:
-					}
-				}
-			}
-		}(temp, out)
-		out = stage(temp)
+		out = stage(outChan(out, done))
 	}
-
-	// Возвращаем "закрываемый" канал
 	return outChan(out, done)
 }
