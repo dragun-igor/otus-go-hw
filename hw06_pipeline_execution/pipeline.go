@@ -8,6 +8,10 @@ type (
 
 type Stage func(in In) (out Out)
 
+func selectCase() {
+
+}
+
 func outChan(in In, done In) Bi {
 	out := make(Bi)
 	go func() {
@@ -57,7 +61,5 @@ func ExecutePipeline(in In, done In, stages ...Stage) Out {
 	}
 
 	// Добавляем выходной канал на чтение и запись, чтобы по сигналу done его можно было закрыть и прервать пайплайн
-	out2 := outChan(out, done)
-
-	return out2
+	return outChan(out, done)
 }
