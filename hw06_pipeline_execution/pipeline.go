@@ -31,7 +31,6 @@ func outChan(in In, done In) Out {
 					case out <- val:
 					}
 				}
-
 			}
 		}
 	}()
