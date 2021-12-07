@@ -1,5 +1,7 @@
 package hw06pipelineexecution
 
+import "sync/atomic"
+
 type (
 	In  = <-chan interface{}
 	Out = In
@@ -8,11 +10,18 @@ type (
 
 type Stage func(in In) (out Out)
 
+var numGoroutines int64 // Переменная для теста
+
 func outChan(in In, done In) Out {
 	// Переброска значений в канал доступный для записи.
 	out := make(Bi)
 	go func() {
-		defer close(out)
+		defer func() {
+			close(out)
+			<-in
+			atomic.AddInt64(&numGoroutines, -1)
+		}()
+		atomic.AddInt64(&numGoroutines, 1)
 		for {
 			select {
 			case <-done:
