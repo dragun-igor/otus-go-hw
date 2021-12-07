@@ -18,7 +18,8 @@ func outChan(in In, done In) Out {
 	go func() {
 		defer func() {
 			close(out)
-			<-in
+			for range in {
+			}
 			atomic.AddInt64(&numGoroutines, -1)
 		}()
 		atomic.AddInt64(&numGoroutines, 1)
