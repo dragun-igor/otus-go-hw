@@ -2,6 +2,7 @@ package hw06pipelineexecution
 
 import (
 	"strconv"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -20,10 +21,12 @@ func TestPipeline(t *testing.T) {
 			out := make(Bi)
 			go func() {
 				defer close(out)
+				atomic.AddInt64(&numGoroutines, 1)
 				for v := range in {
 					time.Sleep(sleepPerStage)
 					out <- f(v)
 				}
+				atomic.AddInt64(&numGoroutines, -1)
 			}()
 			return out
 		}
@@ -86,8 +89,20 @@ func TestPipeline(t *testing.T) {
 			result = append(result, s.(string))
 		}
 		elapsed := time.Since(start)
-
+		time.Sleep(abortDur + fault)
+		require.Equal(t, int(atomic.LoadInt64(&numGoroutines)), 0)
 		require.Len(t, result, 0)
 		require.Less(t, int64(elapsed), int64(abortDur)+int64(fault))
+	})
+
+	// Тест при сразу закрытом канале in
+	t.Run("test with closed in", func(t *testing.T) {
+		in := make(Bi)
+		close(in)
+		result := make([]string, 0, 10)
+		for s := range ExecutePipeline(in, nil, stages...) {
+			result = append(result, s.(string))
+		}
+		require.Equal(t, []string{}, result)
 	})
 }
