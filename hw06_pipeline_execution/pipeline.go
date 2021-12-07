@@ -8,7 +8,7 @@ type (
 
 type Stage func(in In) (out Out)
 
-func outChan(in In, done In) Bi {
+func outChan(in In, done In) Out {
 	// Переброска значений в канал доступный для записи.
 	out := make(Bi)
 	go func() {
@@ -17,15 +17,21 @@ func outChan(in In, done In) Bi {
 			select {
 			case <-done:
 				return
-			case val, ok := <-in:
-				if !ok {
-					return
-				}
+			default:
 				select {
 				case <-done:
 					return
-				case out <- val:
+				case val, ok := <-in:
+					if !ok {
+						return
+					}
+					select {
+					case <-done:
+						return
+					case out <- val:
+					}
 				}
+
 			}
 		}
 	}()
