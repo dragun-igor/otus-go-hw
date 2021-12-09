@@ -4,10 +4,9 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
-	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
+	"path"
 	"strings"
 )
 
@@ -30,9 +29,8 @@ func ReadDir(dir string) (Environment, error) {
 	// Создаём мапу
 	env := Environment{}
 	// Открываем директорию, получаем список файлов
-	files, err := ioutil.ReadDir(dir)
+	files, err := os.ReadDir(dir)
 	if err != nil {
-		fmt.Println("i'm here!", dir)
 		return nil, err
 	}
 	for _, fileStat := range files {
@@ -46,9 +44,12 @@ func ReadDir(dir string) (Environment, error) {
 		if fileStat.Size() == 0 {
 			newEnvValue.NeedRemove = true
 		}
-		fileDir := dir + "/" + fileName
+		fileDir := path.Join(dir, "/", fileName)
 		// Открываем файл, читаем из него байты до переноса строки
-		file, _ := os.Open(fileDir)
+		file, err := os.Open(fileDir)
+		if err != nil {
+			return nil, err
+		}
 		reader := bufio.NewReader(file)
 		byteLine, err := reader.ReadBytes(0x0a)
 		if err != nil && !errors.Is(err, io.EOF) {
