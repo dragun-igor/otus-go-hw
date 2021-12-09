@@ -12,6 +12,6 @@ func (v ValidationErrors) Error() string {
 }
 
 func Validate(v interface{}) error {
-	// Place your code here.
+	// Initial
 	return nil
 }
