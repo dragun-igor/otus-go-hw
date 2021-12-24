@@ -2,11 +2,11 @@ package hw06pipelineexecution
 
 import (
 	"strconv"
-	"sync/atomic"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"go.uber.org/goleak"
 )
 
 const (
@@ -15,18 +15,17 @@ const (
 )
 
 func TestPipeline(t *testing.T) {
+	defer goleak.VerifyNone(t)
 	// Stage generator
 	g := func(_ string, f func(v interface{}) interface{}) Stage {
 		return func(in In) Out {
 			out := make(Bi)
 			go func() {
 				defer close(out)
-				atomic.AddInt64(&numGoroutines, 1)
 				for v := range in {
 					time.Sleep(sleepPerStage)
 					out <- f(v)
 				}
-				atomic.AddInt64(&numGoroutines, -1)
 			}()
 			return out
 		}
@@ -90,7 +89,6 @@ func TestPipeline(t *testing.T) {
 		}
 		elapsed := time.Since(start)
 		time.Sleep(abortDur + fault)
-		require.Equal(t, int(atomic.LoadInt64(&numGoroutines)), 0)
 		require.Len(t, result, 0)
 		require.Less(t, int64(elapsed), int64(abortDur)+int64(fault))
 	})
