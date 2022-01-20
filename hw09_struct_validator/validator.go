@@ -36,6 +36,7 @@ func (v ValidationErrors) Error() string {
 	return res.String()
 }
 
+// ValidateIntMin проверяет значения типа int на минимальное значение.
 func ValidateIntMin(ve ValidationErrors, cur int, iMin string, fieldName string) (ValidationErrors, error) {
 	min, err := strconv.Atoi(iMin)
 	if err != nil {
@@ -50,6 +51,7 @@ func ValidateIntMin(ve ValidationErrors, cur int, iMin string, fieldName string)
 	return ve, nil
 }
 
+// ValidateIntMax проверяет значения типа int на максимальное значение.
 func ValidateIntMax(ve ValidationErrors, cur int, iMax string, fieldName string) (ValidationErrors, error) {
 	max, err := strconv.Atoi(iMax)
 	if err != nil {
@@ -64,6 +66,7 @@ func ValidateIntMax(ve ValidationErrors, cur int, iMax string, fieldName string)
 	return ve, nil
 }
 
+// ValidateIntIn проверяет значения типа int на вхождение во множество.
 func ValidateIntIn(ve ValidationErrors, cur int, in string, fieldName string) (ValidationErrors, error) {
 	for _, iVal := range strings.Split(in, ",") {
 		val, err := strconv.Atoi(iVal)
@@ -81,6 +84,7 @@ func ValidateIntIn(ve ValidationErrors, cur int, in string, fieldName string) (V
 	return ve, nil
 }
 
+// ValidateStringRegexp проверяет значения типа string на соответствие регулярному выражению.
 func ValidateStringRegexp(ve ValidationErrors, cur string, re string, fieldName string) (ValidationErrors, error) {
 	ok, err := regexp.Match(re, []byte(cur))
 	if err != nil {
@@ -95,6 +99,7 @@ func ValidateStringRegexp(ve ValidationErrors, cur string, re string, fieldName 
 	return ve, nil
 }
 
+// ValidateStringLen проверяет значения типа string на количество символов(рун).
 func ValidateStringLen(ve ValidationErrors, cur string, sLen string, fieldName string) (ValidationErrors, error) {
 	counter := utf8.RuneCount([]byte(cur))
 	iLen, err := strconv.Atoi(sLen)
@@ -110,6 +115,7 @@ func ValidateStringLen(ve ValidationErrors, cur string, sLen string, fieldName s
 	return ve, nil
 }
 
+// ValidateStringIn проверяет значения типа string на вхождение во множество.
 func ValidateStringIn(ve ValidationErrors, cur string, in string, fieldName string) (ValidationErrors, error) {
 	for _, val := range strings.Split(in, ",") {
 		if val == cur {
@@ -123,6 +129,7 @@ func ValidateStringIn(ve ValidationErrors, cur string, in string, fieldName stri
 	return ve, nil
 }
 
+// ValidateInt распаковывает теги и проводит проверку значений типа int.
 func ValidateInt(ve ValidationErrors, fieldName string, tags string, value reflect.Value) (ValidationErrors, error) {
 	var err error
 	for _, tag := range strings.Split(tags, "|") {
@@ -145,6 +152,7 @@ func ValidateInt(ve ValidationErrors, fieldName string, tags string, value refle
 	return ve, nil
 }
 
+// ValidateString распаковывает теги и проводит проверку значений типа string.
 func ValidateString(ve ValidationErrors, fieldName string, tags string, value reflect.Value) (ValidationErrors, error) {
 	var err error
 	for _, tag := range strings.Split(tags, "|") {
@@ -167,6 +175,7 @@ func ValidateString(ve ValidationErrors, fieldName string, tags string, value re
 	return ve, nil
 }
 
+// ValidatorSwitch проверяет тип значения поля и вызывает функции проверки.
 func ValidatorSwitch(ve ValidationErrors, structField reflect.StructField,
 	value reflect.Value) (ValidationErrors, error) {
 	var err error
@@ -206,6 +215,7 @@ func ValidatorSwitch(ve ValidationErrors, structField reflect.StructField,
 	return ve, err
 }
 
+// Validate запускает валидацию структуры.
 func Validate(ve ValidationErrors, iv interface{}) (ValidationErrors, error) {
 	var err error
 	v := reflect.ValueOf(iv)
