@@ -23,10 +23,10 @@ func GetDomainStat(r io.Reader, domain string) (DomainStat, error) {
 	scanner.Split(bufio.ScanLines)
 
 	for scanner.Scan() {
-		if err = json.Unmarshal(scanner.Bytes(), &user); err != nil {
-			return nil, fmt.Errorf("get users error: %w", err)
-		}
-		if strings.Contains(user.Email, "."+domain) {
+		if strings.Contains(scanner.Text(), "."+domain) {
+			if err = json.Unmarshal(scanner.Bytes(), &user); err != nil {
+				return nil, fmt.Errorf("get users error: %w", err)
+			}
 			result[strings.ToLower(strings.SplitN(user.Email, "@", 2)[1])]++
 		}
 	}
