@@ -23,6 +23,9 @@ func GetDomainStat(r io.Reader, domain string) (DomainStat, error) {
 	scanner.Split(bufio.ScanLines)
 
 	for scanner.Scan() {
+		if !json.Valid(scanner.Bytes()) {
+			return nil, fmt.Errorf("invalid json")
+		}
 		if strings.Contains(scanner.Text(), "."+domain) {
 			if err = json.Unmarshal(scanner.Bytes(), &user); err != nil {
 				return nil, fmt.Errorf("get users error: %w", err)
