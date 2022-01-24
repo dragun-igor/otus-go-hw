@@ -17,7 +17,7 @@ type DomainStat map[string]int
 func GetDomainStat(r io.Reader, domain string) (DomainStat, error) {
 	var user User
 	var err error
-	result := make(DomainStat, 400)
+	result := make(DomainStat)
 
 	scanner := bufio.NewScanner(r)
 	scanner.Split(bufio.ScanLines)
